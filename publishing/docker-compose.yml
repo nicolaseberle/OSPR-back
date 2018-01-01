@@ -1,0 +1,23 @@
+version: '2'
+services:
+  publishing:
+    build: ./app/
+    container_name: "publishing_service"
+    ports:
+      - "3011:1337"
+    volumes:
+      - "./app:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    links:
+      - "mongodb"
+    depends_on:
+      - "mongodb"
+  mongodb:
+    image: mongo:3.4.4
+    container_name: "publishing_mongodb"
+    ports: 
+      - "27017"
+    volumes:
+      - "/data/mongodb:/data/db"
+    command: mongod --smallfiles # --quiet
+        

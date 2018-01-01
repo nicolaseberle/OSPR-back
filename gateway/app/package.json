@@ -1,0 +1,20 @@
+{
+  "name": "gateway",
+  "version": "0.0.0",
+  "owner": "ospr@ospr.ospr",
+  "private": true,
+  "scripts": {
+    "start": "node /usr/src/app",
+    "lint": "./node_modules/eslint/bin/eslint.js --cache --fix ."
+  },
+  "dependencies": {
+    "body-parser": "~1.16.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "ejs": "~2.5.5",
+    "express": "~4.14.1",
+    "morgan": "~1.7.0",
+    "serve-favicon": "~2.3.2",
+    "whatwg-fetch": "^2.0.2"
+  }
+}

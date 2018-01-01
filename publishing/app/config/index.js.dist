@@ -1,0 +1,14 @@
+const config = {};
+
+config.db = {
+  db: 'publishing-service',
+  host: 'mongodb',
+  user: '',
+  pw: '',
+  port: '27017'
+};
+
+config.apiKeyHeader = 'X-API-KEY';
+config.apiKey = 'ThisIsASecretKeyThatYouShouldChange';
+
+module.exports = config;
