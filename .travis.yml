@@ -1,0 +1,40 @@
+language: node_js
+sudo: required
+dist: trusty
+
+node_js:
+  - '7'
+env:
+  - SERVICE_DIR=gateway
+  - SERVICE_DIR=publishing
+script: [
+  "docker-compose exec $SERVICE_DIR npm test"
+]
+addons:
+  apt:
+    packages:
+    - sshpass
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
+  - docker-compose --version
+
+before_script: 
+  - chmod +x .travis/setup.sh
+  - .travis/setup.sh
+  - cd $SERVICE_DIR/app && docker-compose up --build -d
+
+after_script:
+  - docker-compose down
+
+after_success:
+  - mkdir build
+  - mv * build
+  - tar -czf package.tgz build
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sshpass -e scp -P $DEPLOY_PORT -o StrictHostKeyChecking=no package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH_SCRIPT
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "recette" && sshpass -e scp -P $DEPLOY_PORT -o StrictHostKeyChecking=no package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH_SCRIPT
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "develop" && sshpass -e scp -P $DEPLOY_PORT -o StrictHostKeyChecking=no package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH_SCRIPT
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sshpass -e ssh -p $DEPLOY_PORT -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST $DEPLOY_PATH_SCRIPT/deploy.sh $DEPLOY_PATH_PROD
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "recette" && sshpass -e ssh -p $DEPLOY_PORT -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST $DEPLOY_PATH_SCRIPT/deploy.sh $DEPLOY_PATH_RECETTE
+  - $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "develop" && sshpass -e ssh -p $DEPLOY_PORT -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST $DEPLOY_PATH_SCRIPT/deploy.sh $DEPLOY_PATH_DEVELOP
